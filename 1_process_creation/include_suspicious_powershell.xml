@@ -14,6 +14,11 @@
                     <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">http</CommandLine>
                     <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">replace</CommandLine> <!--Kill Unicorns-->
                 </Rule>
+                <!-- Detection atomic-redteam t1105-7,8 https://car.mitre.org/analytics/CAR-2021-05-007/ and https://car.mitre.org/analytics/CAR-2021-05-006/ -->
+                <Rule name="technique_id=T1105,technique_name=Ingress Tool Transfer" groupRelation="and">
+                    <CommandLine condition="contains any">urlcache;verifyctl</CommandLine>
+                    <OriginalFileName condition="is">CertUtil.exe</OriginalFileName>
+                </Rule>
             </ProcessCreate>
         </RuleGroup>
     </EventFiltering>
