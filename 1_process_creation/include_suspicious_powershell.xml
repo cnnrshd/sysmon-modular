@@ -2,19 +2,18 @@
     <EventFiltering>
         <RuleGroup name="" groupRelation="or">
             <ProcessCreate onmatch="include">
-                <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">FromBase64</CommandLine>
-            </ProcessCreate>
-            <ProcessCreate onmatch="include">
-                <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">gzip</CommandLine>
-            </ProcessCreate>
-            <ProcessCreate onmatch="include">
-                <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">decompress</CommandLine>
-            </ProcessCreate>
-            <ProcessCreate onmatch="include">
-                <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">http</CommandLine>
-            </ProcessCreate>
-            <ProcessCreate onmatch="include">
-                <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">replace</CommandLine> <!--Kill Unicorns-->
+                <Rule name="Obfuscated Files or Information" groupRelation="or">
+                    <!-- Properly detecting PowerShell requires scriptblocklogging https://www.blackhat.com/docs/us-17/thursday/us-17-Bohannon-Revoke-Obfuscation-PowerShell-Obfuscation-Detection-And%20Evasion-Using-Science-wp.pdf -->
+                    <!-- Cop-out, but PowerShell called with a variable might be a decent indicator -->
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">$</CommandLine>
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains any">iex;IEX;invoke;Invoke</CommandLine>
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">Base64</CommandLine>
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains any">-enc;-EncodedCommand</CommandLine>
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains any">gzip;compress;decompress</CommandLine>
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">convert</CommandLine>
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">http</CommandLine>
+                    <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">replace</CommandLine> <!--Kill Unicorns-->
+                </Rule>
             </ProcessCreate>
         </RuleGroup>
     </EventFiltering>
