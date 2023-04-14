@@ -29,6 +29,7 @@ filepath,priority
 1_process_creation/include_msbuild.xml,10
 1_process_creation/include_msoffice.xml,10
 1_process_creation/include_regsvcs_regasm.xml,10
+1_process_creation/include_rundll32.xml,100
 1_process_creation/include_shells.xml,1
 1_process_creation/include_suspicious_atbroker.xml,100
 1_process_creation/include_suspicious_powershell.xml,100

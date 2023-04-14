@@ -1,0 +1,19 @@
+<Sysmon schemaversion="4.40">
+	<EventFiltering>
+		<RuleGroup name="" groupRelation="or">
+			<ProcessCreate onmatch="include">
+                <!-- Checks for 1218.011 techniques -->
+                <!-- atomic-redteam t1218.011-2,3 -->
+                <Rule name="technique_id=T1218.011,technique_name=Rundll32" groupRelation="and">
+                    <OriginalFileName condition="is">RUNDLL32.EXE</OriginalFileName>
+                    <CommandLine condition="contains">script</CommandLine>
+                </Rule>
+                <!-- atomic-redteam t1218.011-13 -->
+                <Rule name="technique_id=T1218.011,technique_name=Rundll32" groupRelation="and">
+                    <OriginalFileName condition="is">RUNDLL32.EXE</OriginalFileName>
+                    <CommandLine condition="contains">Install</CommandLine>
+                </Rule>
+			</ProcessCreate>
+		</RuleGroup>
+	</EventFiltering>
+</Sysmon>
