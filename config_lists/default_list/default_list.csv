@@ -15,7 +15,7 @@ filepath,priority
 1_process_creation/include_accessibility_features.xml,10
 1_process_creation/include_all.xml,0
 1_process_creation/include_appc_shim.xml,10
-1_process_creation/include_bitsadmin.xml,10
+1_process_creation/include_bitsadmin.xml,20
 1_process_creation/include_bypass_uac.xml,100
 1_process_creation/include_dcom_lateral_movement.xml,10
 1_process_creation/include_disabling_windows_defender.xml,10
@@ -36,7 +36,8 @@ filepath,priority
 1_process_creation/include_syncappvpublishingserver.xml,10
 1_process_creation/include_sysinternals.xml,10
 1_process_creation/include_system_recovery.xml,10
-1_process_creation/include_uncommon_locations.xml,10
+1_process_creation/include_t1569.002.xml,100
+1_process_creation/include_uncommon_locations.xml,20
 1_process_creation/include_windows_control_panel.xml,10
 1_process_creation/include_windows_defender_tampering.xml,10
 1_process_creation/include_windows_remote_management.xml,10

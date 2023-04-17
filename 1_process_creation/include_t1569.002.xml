@@ -1,0 +1,13 @@
+<Sysmon schemaversion="4.40">
+    <EventFiltering>
+        <RuleGroup name="" groupRelation="or">
+            <ProcessCreate onmatch="include">
+                <Rule name="technique_id=T1569.002,technique_name=Service Execution" groupRelation="and">
+                    <!-- Whatever this rule doesn't catch, the general sc.exe rule in include_living_off_the_land.xml should -->
+                    <OriginalFileName condition="is">sc.exe</OriginalFileName>
+                    <CommandLine condition="contains any">powershell.exe;cmd.exe;/c</CommandLine>
+                </Rule>
+            </ProcessCreate>
+        </RuleGroup>
+    </EventFiltering>
+</Sysmon>
