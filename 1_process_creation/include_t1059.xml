@@ -1,0 +1,18 @@
+<Sysmon schemaversion="4.30">
+    <EventFiltering>
+      <RuleGroup name="" groupRelation="or">
+        <ProcessCreate onmatch="include">
+            <!-- Implementations of https://github.com/SigmaHQ/sigma/blob/e2d48cf455d425ac17066fe438351cdb42dcfe60/rules/windows/process_creation/proc_creation_win_script_execution.yml -->
+            <Rule name="technique_id=T1059.005,technique_name=Visual Basic" groupRelation="and">
+              <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
+              <CommandLine condition="contains any">.vba;.vbe;.vbs</CommandLine>
+            </Rule>
+            <Rule name="technique_id=T1059.007,technique_name=JavaScript" groupRelation="and">
+              <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
+              <CommandLine condition="contains any">.js;.jse</CommandLine>
+            </Rule>
+        </ProcessCreate>
+      </RuleGroup>
+    </EventFiltering>
+  </Sysmon>
+  

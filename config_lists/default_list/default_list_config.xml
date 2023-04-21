@@ -50,6 +50,7 @@
           <OriginalFileName condition="is">ATBroker.exe</OriginalFileName>
           <CommandLine condition="contains">start</CommandLine>
         </Rule>
+<<<<<<< Updated upstream
         <Rule name="Obfuscated Files or Information" groupRelation="or">
           <!-- Properly detecting PowerShell requires scriptblocklogging https://www.blackhat.com/docs/us-17/thursday/us-17-Bohannon-Revoke-Obfuscation-PowerShell-Obfuscation-Detection-And%20Evasion-Using-Science-wp.pdf -->
           <!-- Cop-out, but PowerShell called with a variable might be a decent indicator -->
@@ -96,6 +97,23 @@
         <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Desktop\</Image>
         <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Appdata\Local\</Image>
         <!--Thanks to Josh Frazier-->
+=======
+        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">FromBase64</CommandLine>
+        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">gzip</CommandLine>
+        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">decompress</CommandLine>
+        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">http</CommandLine>
+        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">replace</CommandLine>
+        <!--Kill Unicorns-->
+        <!-- Implementations of https://github.com/SigmaHQ/sigma/blob/e2d48cf455d425ac17066fe438351cdb42dcfe60/rules/windows/process_creation/proc_creation_win_script_execution.yml -->
+        <Rule name="technique_id=T1059.005,technique_name=Visual Basic" groupRelation="and">
+          <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
+          <CommandLine condition="contains any">.vba;.vbe;.vbs</CommandLine>
+        </Rule>
+        <Rule name="technique_id=T1059.007,technique_name=JavaScript" groupRelation="and">
+          <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
+          <CommandLine condition="contains any">.js;.jse</CommandLine>
+        </Rule>
+>>>>>>> Stashed changes
         <ParentImage name="technique_id=T1546.008,technique_name=Accessibility Features" condition="image">sethc.exe</ParentImage>
         <ParentImage name="technique_id=T1546.008,technique_name=Accessibility Features" condition="image">utilman.exe</ParentImage>
         <ParentImage name="technique_id=T1546.008,technique_name=Accessibility Features" condition="image">osk.exe</ParentImage>
