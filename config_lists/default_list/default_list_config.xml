@@ -50,7 +50,6 @@
           <OriginalFileName condition="is">ATBroker.exe</OriginalFileName>
           <CommandLine condition="contains">start</CommandLine>
         </Rule>
-<<<<<<< Updated upstream
         <Rule name="Obfuscated Files or Information" groupRelation="or">
           <!-- Properly detecting PowerShell requires scriptblocklogging https://www.blackhat.com/docs/us-17/thursday/us-17-Bohannon-Revoke-Obfuscation-PowerShell-Obfuscation-Detection-And%20Evasion-Using-Science-wp.pdf -->
           <!-- Cop-out, but PowerShell called with a variable might be a decent indicator -->
@@ -73,6 +72,15 @@
           <!-- Whatever this rule doesn't catch, the general sc.exe rule in include_living_off_the_land.xml should -->
           <OriginalFileName condition="is">sc.exe</OriginalFileName>
           <CommandLine condition="contains any">powershell.exe;cmd.exe;/c</CommandLine>
+        </Rule>
+        <!-- Implementations of https://github.com/SigmaHQ/sigma/blob/e2d48cf455d425ac17066fe438351cdb42dcfe60/rules/windows/process_creation/proc_creation_win_script_execution.yml -->
+        <Rule name="technique_id=T1059.005,technique_name=Visual Basic" groupRelation="and">
+          <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
+          <CommandLine condition="contains any">.vba;.vbe;.vbs</CommandLine>
+        </Rule>
+        <Rule name="technique_id=T1059.007,technique_name=JavaScript" groupRelation="and">
+          <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
+          <CommandLine condition="contains any">.js;.jse</CommandLine>
         </Rule>
         <OriginalFileName name="technique_id=T1197,technique_name=BITS Jobs" condition="is">bitsadmin.exe</OriginalFileName>
         <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\PerfLogs\</Image>
@@ -97,23 +105,6 @@
         <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Desktop\</Image>
         <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Appdata\Local\</Image>
         <!--Thanks to Josh Frazier-->
-=======
-        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">FromBase64</CommandLine>
-        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">gzip</CommandLine>
-        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">decompress</CommandLine>
-        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">http</CommandLine>
-        <CommandLine name="technique_id=T1027,technique_name=Obfuscated Files or Information" condition="contains">replace</CommandLine>
-        <!--Kill Unicorns-->
-        <!-- Implementations of https://github.com/SigmaHQ/sigma/blob/e2d48cf455d425ac17066fe438351cdb42dcfe60/rules/windows/process_creation/proc_creation_win_script_execution.yml -->
-        <Rule name="technique_id=T1059.005,technique_name=Visual Basic" groupRelation="and">
-          <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
-          <CommandLine condition="contains any">.vba;.vbe;.vbs</CommandLine>
-        </Rule>
-        <Rule name="technique_id=T1059.007,technique_name=JavaScript" groupRelation="and">
-          <OriginalFileName condition="is any">wscript.exe;cscript.exe</OriginalFileName>
-          <CommandLine condition="contains any">.js;.jse</CommandLine>
-        </Rule>
->>>>>>> Stashed changes
         <ParentImage name="technique_id=T1546.008,technique_name=Accessibility Features" condition="image">sethc.exe</ParentImage>
         <ParentImage name="technique_id=T1546.008,technique_name=Accessibility Features" condition="image">utilman.exe</ParentImage>
         <ParentImage name="technique_id=T1546.008,technique_name=Accessibility Features" condition="image">osk.exe</ParentImage>
@@ -580,6 +571,28 @@
           <OriginalFileName name="technique_id=T1490,technique_name=Inhibit System Recovery" condition="is">bcdedit.exe</OriginalFileName>
           <CommandLine name="technique_id=T1490,technique_name=Inhibit System Recovery" condition="contains all">bootstatuspolicy;ignoreallfailures</CommandLine>
         </Rule>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\PerfLogs\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\$Recycle.bin\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Intel\Logs\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Users\Default\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Users\Public\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Users\NetworkService\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\Fonts\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\Debug\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\Media\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\Help\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\addins\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\repair\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\security\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="begin with">C:\Windows\system32\config\systemprofile\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">VolumeShadowCopy</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\htdocs\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\wwwroot\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Temp\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Downloads\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Desktop\</Image>
+        <Image name="technique_id=T1036,technique_name=Masquerading" condition="contains">\Appdata\Local\</Image>
+        <!--Thanks to Josh Frazier-->
         <Rule name="Control Panel Items" groupRelation="or">
           <CommandLine name="technique_id=T1218.002,technique_name=Control Panel Items" condition="contains all">control;/name</CommandLine>
           <CommandLine name="technique_id=T1218.002,technique_name=Control Panel Items" condition="contains all">rundll32.exe;shell32.dll;Control_RunDLL</CommandLine>

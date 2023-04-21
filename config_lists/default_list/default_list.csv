@@ -36,13 +36,10 @@ filepath,priority
 1_process_creation/include_syncappvpublishingserver.xml,10
 1_process_creation/include_sysinternals.xml,10
 1_process_creation/include_system_recovery.xml,10
-<<<<<<< Updated upstream
 1_process_creation/include_t1569.002.xml,100
 1_process_creation/include_uncommon_locations.xml,20
-=======
 1_process_creation/include_t1059.xml,100
 1_process_creation/include_uncommon_locations.xml,10
->>>>>>> Stashed changes
 1_process_creation/include_windows_control_panel.xml,10
 1_process_creation/include_windows_defender_tampering.xml,10
 1_process_creation/include_windows_remote_management.xml,10
