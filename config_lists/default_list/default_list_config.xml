@@ -372,6 +372,11 @@
           <CommandLine condition="contains any">hklm;HKLM;hkey_local_machine</CommandLine>
           <CommandLine condition="contains any">\system;\sam;\security</CommandLine>
         </Rule>
+        <!-- Very generalized registry modification detection -->
+        <Rule name="technique_id=T1112,technique_name=Modify Registry" groupRelation="and">
+          <OriginalFileName condition="is any">reg.exe;regedit.exe</OriginalFileName>
+          <CommandLine condition="contains any">add;delete</CommandLine>
+        </Rule>
         <!-- SECTION: EXECUTION -->
         <Rule name="technique_id=T1202,technique_name=Indirect Command Execution" groupRelation="and">
           <ParentImage condition="is">hh.exe</ParentImage>
