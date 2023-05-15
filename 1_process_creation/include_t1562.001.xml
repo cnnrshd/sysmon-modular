@@ -1,0 +1,52 @@
+<Sysmon schemaversion="4.30">
+  <EventFiltering>
+    <RuleGroup name="" groupRelation="or">
+      <ProcessCreate onmatch="include">
+        <Rule
+          name="technique_id=T1562.001,technique_name=Disable or Modify Tools - Uninstall Sysmon"
+          groupRelation="and">
+          <OriginalFileName condition="is any">sysmon.exe;sysmon64.exe</OriginalFileName>
+          <ParentCommandLine condition="contains">-u</ParentCommandLine>
+        </Rule>
+        <Rule name="technique_id=T1562.001,technique_name=Disable or Modify Tools - Unload Sysmon"
+          groupRelation="and">
+          <OriginalFileName condition="is any">fltMC.exe</OriginalFileName>
+          <ParentCommandLine condition="contains">unload</ParentCommandLine>
+          <ParentCommandLine condition="contains any">sysmon;Sysmon</ParentCommandLine>
+        </Rule>
+        <Rule name="technique_id=T1562.001,technique_name=Disable or Modify Tools - AMSI patch"
+          groupRelation="and">
+          <OriginalFileName condition="is any">CONHOST.EXE;cmd.exe;powershell.exe</OriginalFileName>
+          <ParentCommandLine condition="contains all">AmsiUtils;amsiInitFailed</ParentCommandLine>
+        </Rule>
+        <!-- Removal may indicate bypassing security, adding may indicate persistence
+        https://b4rtik.github.io/posts/antimalware-scan-interface-provider-for-persistence/ -->
+        <Rule
+          name="technique_id=T1562.001,technique_name=Disable or Modify Tools - ASMI modification"
+          groupRelation="and">
+          <OriginalFileName condition="is">CONHOST.EXE</OriginalFileName>
+          <ParentCommandLine condition="contains">HKLM:\SOFTWARE\Microsoft\AMSI\Providers</ParentCommandLine>
+        </Rule>
+        <Rule name="technique_id=T1562.001,technique_name=Disable or Modify Tools - WinDefender"
+          groupRelation="and">
+          <OriginalFileName condition="is">CONHOST.EXE</OriginalFileName>
+          <ParentCommandLine condition="contains">HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender</ParentCommandLine>
+        </Rule>
+        <!-- PowerShell registry modifications seem to call CONHOST.EXE with the ParentCommandLine
+        of the PowerShell command used -->
+        <Rule name="technique_id=T1562.001,technique_name=Disable or Modify Tools - WinDefender"
+          groupRelation="and">
+          <ParentCommandLine condition="contains">MpPreference</ParentCommandLine>
+        </Rule>
+
+        <Rule name="technique_id=T1562.001,technique_name=Disable or Modify Tools - Defender"
+          groupRelation="and">
+          <OriginalFileName>DismHost.exe</OriginalFileName>
+          <ParentCommandLine condition="contains">Windows-Defender</ParentCommandLine>
+          <ParentCommandLine condition="contains any">Disable;disable;remove;Remove</ParentCommandLine>
+        </Rule>
+      </ProcessCreate>
+    </RuleGroup>
+  </EventFiltering>
+</Sysmon>
+  

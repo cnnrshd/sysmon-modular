@@ -19,6 +19,7 @@ filepath,priority
 1_process_creation/include_bypass_uac.xml,100
 1_process_creation/include_dcom_lateral_movement.xml,10
 1_process_creation/include_disabling_windows_defender.xml,10
+1_process_creation/include_dism.xml,50
 1_process_creation/include_dosfuscation.xml,10
 1_process_creation/include_explorer.xml,10
 1_process_creation/include_fltmc.xml,10
@@ -37,6 +38,7 @@ filepath,priority
 1_process_creation/include_sysinternals.xml,10
 1_process_creation/include_system_recovery.xml,10
 1_process_creation/include_t1059.xml,100
+1_process_creation/include_t1562.001.xml,100
 1_process_creation/include_t1569.002.xml,100
 1_process_creation/include_uncommon_locations.xml,20
 1_process_creation/include_windows_control_panel.xml,10

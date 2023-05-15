@@ -1,0 +1,15 @@
+<Sysmon schemaversion="4.30">
+    <EventFiltering>
+        <RuleGroup name="" groupRelation="or">
+            <ProcessCreate onmatch="include">
+                <!-- DISM can be used for several purposes - an adversarial use is removing features
+                like Defender (see T1562) -->
+                <Rule name="DISM used to remove feature" groupRelation="and">
+                    <OriginalFileName>DismHost.exe</OriginalFileName>
+                    <ParentCommandLine condition="contains">Feature</ParentCommandLine>
+                    <ParentCommandLine condition="contains any">Disable;disable;Remove;remove</ParentCommandLine>
+                </Rule>
+            </ProcessCreate>
+        </RuleGroup>
+    </EventFiltering>
+</Sysmon>
