@@ -978,6 +978,12 @@
     </RuleGroup>
     <RuleGroup name="" groupRelation="or">
       <RegistryEvent onmatch="include">
+        <!-- Add additional credential dumping detections to the rule below-->
+        <Rule name="technique_id=T1003,technique_name=OS Credential Dumping - NPPSpy">
+          <TargetObject condition="contains all">NPPSpy;NetworkProvider\ProviderPath</TargetObject>
+        </Rule>
+        <!-- General Network Provider registration - check DLLs -->
+        <TargetObject name="technique_id=T1556.008,technique_name=Network Provider DLL" condition="contains">NetworkProvider\ProviderPath</TargetObject>
         <!-- COMMENT: Modified include_windows_consent that includes filters for common applications that would access these keys -->
         <Rule groupRelation="and">
           <TargetObject name="technique_id=T1125,technique_name=Video Capture" condition="contains">\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam</TargetObject>
@@ -1551,6 +1557,167 @@
         <!-- COMMENT: Removed the services technique id - this event is captured for visibility, not because it indicates an attack -->
         <TargetObject condition="begin with">HKLM\SYSTEM\CurrentControlSet\Services</TargetObject>
       </RegistryEvent>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <ImageLoad onmatch="include">
+        <!-- SAM-related DLLS being loaded from non-system locations. This is suspicious. -->
+        <Rule name="technique_id=T1003,technique_name=OS Credential Dumping" groupRelation="and">
+          <OriginalFileName condition="is any">samsrv.dll;samcli.dll</OriginalFileName>
+          <Image condition="excludes all">
+            C:\Windows\System32;C:\Windows\SysWOW64;C:\Windows\WinSxS;C:\Windows\SoftwareDistribution</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1059.001,technique_name=PowerShell" condition="is">amsi.dll</OriginalFileName>
+          <Image condition="excludes any">powershell.exe;powershell_ise.exe</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <Image name="technique_id=T1037.005,technique_name=Boot or Logon Initialization Scripts - Startup Items" condition="end with">bginfo.exe</Image>
+          <ImageLoaded condition="contains any">System.ni.dll;System.Core.ni.dll</ImageLoaded>
+        </Rule>
+        <ImageLoaded name="technique_id=T1197,technique_name=BITS" condition="end with">bitsproxy.dll</ImageLoaded>
+        <!-- Credit https://redhead0ntherun.medium.com/detecting-net-c-injection-execute-assembly-1894dbb04ff7-->
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">clr.dll</OriginalFileName>
+          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">clrjit.dll</OriginalFileName>
+          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscoreei.dll</OriginalFileName>
+          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscoree.dll</OriginalFileName>
+          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscoreeis.dll</OriginalFileName>
+          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscorlib.dll</OriginalFileName>
+          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscorlib.ni.dll</OriginalFileName>
+          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
+        </Rule>
+        <!--COMMENT:	Can cause high system load, disabled by default.-->
+        <ImageLoaded name="technique_id=T1047,technique_name=Windows Scheduled Tasks" condition="end with">mstask.dll</ImageLoaded>
+        <!---Thanks to Carlos Perez-->
+        <ImageLoaded name="technique_id=T1059,technique_name=Command and Scripting Interpreter" condition="end with">wshom.ocx</ImageLoaded>
+        <OriginalFileName condition="is">scrrun.dll</OriginalFileName>
+        <OriginalFileName condition="is">vbscript.dll</OriginalFileName>
+        <!--Detect execution of HTA using the IE Javascript engine to bypass AMSI-->
+        <!--Note: Rule placed before Windows Scriptingh to ensure it triggers on this on case any other component is used.-->
+        <!---Thanks to Carlos Perez-->
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1218.005,technique_name=MSHTA with AMSI Bypass" condition="is">jscript.dll</OriginalFileName>
+          <Image condition="end with">mshta.exe</Image>
+        </Rule>
+        <Rule groupRelation="and">
+          <OriginalFileName name="technique_id=T1218.005,technique_name=MSHTA with AMSI Bypass" condition="is">jscript9.dll</OriginalFileName>
+          <Image condition="end with">mshta.exe</Image>
+        </Rule>
+        <ImageLoaded name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">.wll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">.xll</ImageLoaded>
+        <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
+        <Rule groupRelation="and">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName name="technique_id=T1559.001,technique_name=Component Object Model" condition="is">combase.dll</OriginalFileName>
+        </Rule>
+        <Rule groupRelation="and">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName name="technique_id=T1559.001,technique_name=Component Object Model" condition="is">coml2.dll</OriginalFileName>
+        </Rule>
+        <Rule groupRelation="and">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName name="technique_id=T1559.001,technique_name=Component Object Model" condition="is">comsvcs.dll</OriginalFileName>
+        </Rule>
+        <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
+        <Rule groupRelation="and" name="technique_id=T1055,technique_name=Process Injection">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <ImageLoaded condition="begin with">C:\Windows\assembly\</ImageLoaded>
+        </Rule>
+        <Rule groupRelation="and" name="technique_id=T1055,technique_name=Process Injection">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <ImageLoaded condition="begin with">C:\Windows\Microsoft.NET\assembly\GAC_MSIL</ImageLoaded>
+        </Rule>
+        <Rule groupRelation="and" name="technique_id=T1055,technique_name=Process Injection">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName condition="is">clr.dll</OriginalFileName>
+        </Rule>
+        <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
+        <Rule groupRelation="and" name="technique_id=T1059.005,technique_name=Command and Scripting Interpreter VBScript">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName condition="is">VBE7INTL.DLL</OriginalFileName>
+        </Rule>
+        <Rule groupRelation="and" name="technique_id=T1059.005,technique_name=Command and Scripting Interpreter VBScript">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName condition="is">VBE7.DLL</OriginalFileName>
+        </Rule>
+        <Rule groupRelation="and" name="technique_id=T1059.005,technique_name=Command and Scripting Interpreter VBScript">
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName condition="is">VBEUI.DLL</OriginalFileName>
+        </Rule>
+        <Rule groupRelation="and" name="technique_id=T1137.001,technique_name=Office Application Startup - Office Template Macros">
+          <!-- Credit to  @HeirhabarovT -->
+          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <OriginalFileName condition="is">OUTLVBA.DLL</OriginalFileName>
+        </Rule>
+        <Image name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">VSTOInstaller.exe</Image>
+        <Rule groupRelation="and">
+          <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
+          <Image name="technique_id=T1047,technique_name=Windows Management Instrumentation" condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
+          <ImageLoaded condition="is">C:\Windows\SysWOW64\wbem\wbemdisp.dll</ImageLoaded>
+        </Rule>
+        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">system.management.automation.ni.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">system.management.automation.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Commands.Diagnostics.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Commands.Management.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Commands.Utility.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.ConsoleHost.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Security.dll</ImageLoaded>
+        <ImageLoaded name="technique_id=T1210,technique_name=Exploitation of Remote Services" condition="begin with">C:\Windows\System32\spool\drivers\</ImageLoaded>
+        <!--In order to detect PrintNightmare on servers-->
+        <OriginalFileName name="technique_id=T1112,technique_name=Modify Registry" condition="is">regsvc.dll</OriginalFileName>
+        <Rule groupRelation="and">
+          <Image condition="end with">rundll32.exe</Image>
+          <OriginalFileName name="technique_id=T1003.004,technique_name=LSASS Memory" condition="is">comsvcs.dll</OriginalFileName>
+        </Rule>
+        <OriginalFileName name="technique_id=T1053,technique_name=Scheduled Task" condition="is">taskschd.dll</OriginalFileName>
+        <ImageLoaded name="technique_id=T1218.010,technique_name=Regsvr32" condition="end with">scrobj.dll</ImageLoaded>
+        <OriginalFileName name="technique_id=T1218.010,technique_name=Regsvr32" condition="is">scrobj.dll</OriginalFileName>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains any">admin$;c$;\\;\appdata\;\temp\</ImageLoaded>
+        <!-- loaded from network file share -->
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">c:\programdata\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Media\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\addins\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\system32\config\systemprofile\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Debug\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Temp</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\PerfLogs\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Help\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Intel\Logs\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Temp</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\repair\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\security\</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Fonts\</ImageLoaded>
+        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Downloads</ImageLoaded>
+        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Public</ImageLoaded>
+        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Documents</ImageLoaded>
+        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Music</ImageLoaded>
+        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Video</ImageLoaded>
+        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">file:</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">$Recycle.bin\</ImageLoaded>
+        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">\Windows\IME\</ImageLoaded>
+        <Rule groupRelation="and">
+          <OriginalFileName condition="is">urlmon.dll</OriginalFileName>
+        </Rule>
+        <ImageLoaded name="technique_id=T1047,technique_name=Windows Management Instrumentation" condition="end with">wmiutils.dll</ImageLoaded>
+      </ImageLoad>
     </RuleGroup>
     <RuleGroup name="" groupRelation="or">
       <ProcessCreate onmatch="exclude">
@@ -3391,161 +3558,6 @@
           <Image condition="contains all"> C:\Users\;\AppData\Local\Microsoft\OneDrive;\FileCoAuth.exe</Image>
           <ImageLoaded condition="contains all">C:\Users\;\AppData\Local\Microsoft\OneDrive\;\FileCoAuth.exe</ImageLoaded>
         </Rule>
-      </ImageLoad>
-    </RuleGroup>
-    <RuleGroup name="" groupRelation="or">
-      <ImageLoad onmatch="include">
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1059.001,technique_name=PowerShell" condition="is">amsi.dll</OriginalFileName>
-          <Image condition="excludes any">powershell.exe;powershell_ise.exe</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <Image name="technique_id=T1037.005,technique_name=Boot or Logon Initialization Scripts - Startup Items" condition="end with">bginfo.exe</Image>
-          <ImageLoaded condition="contains any">System.ni.dll;System.Core.ni.dll</ImageLoaded>
-        </Rule>
-        <ImageLoaded name="technique_id=T1197,technique_name=BITS" condition="end with">bitsproxy.dll</ImageLoaded>
-        <!-- Credit https://redhead0ntherun.medium.com/detecting-net-c-injection-execute-assembly-1894dbb04ff7-->
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">clr.dll</OriginalFileName>
-          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">clrjit.dll</OriginalFileName>
-          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscoreei.dll</OriginalFileName>
-          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscoree.dll</OriginalFileName>
-          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscoreeis.dll</OriginalFileName>
-          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscorlib.dll</OriginalFileName>
-          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1055,technique_name=Process Injection" condition="is">mscorlib.ni.dll</OriginalFileName>
-          <Image condition="excludes">C:\Windows\Microsoft.NET\</Image>
-        </Rule>
-        <!--COMMENT:	Can cause high system load, disabled by default.-->
-        <ImageLoaded name="technique_id=T1047,technique_name=Windows Scheduled Tasks" condition="end with">mstask.dll</ImageLoaded>
-        <!---Thanks to Carlos Perez-->
-        <ImageLoaded name="technique_id=T1059,technique_name=Command and Scripting Interpreter" condition="end with">wshom.ocx</ImageLoaded>
-        <OriginalFileName condition="is">scrrun.dll</OriginalFileName>
-        <OriginalFileName condition="is">vbscript.dll</OriginalFileName>
-        <!--Detect execution of HTA using the IE Javascript engine to bypass AMSI-->
-        <!--Note: Rule placed before Windows Scriptingh to ensure it triggers on this on case any other component is used.-->
-        <!---Thanks to Carlos Perez-->
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1218.005,technique_name=MSHTA with AMSI Bypass" condition="is">jscript.dll</OriginalFileName>
-          <Image condition="end with">mshta.exe</Image>
-        </Rule>
-        <Rule groupRelation="and">
-          <OriginalFileName name="technique_id=T1218.005,technique_name=MSHTA with AMSI Bypass" condition="is">jscript9.dll</OriginalFileName>
-          <Image condition="end with">mshta.exe</Image>
-        </Rule>
-        <ImageLoaded name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">.wll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">.xll</ImageLoaded>
-        <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
-        <Rule groupRelation="and">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName name="technique_id=T1559.001,technique_name=Component Object Model" condition="is">combase.dll</OriginalFileName>
-        </Rule>
-        <Rule groupRelation="and">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName name="technique_id=T1559.001,technique_name=Component Object Model" condition="is">coml2.dll</OriginalFileName>
-        </Rule>
-        <Rule groupRelation="and">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName name="technique_id=T1559.001,technique_name=Component Object Model" condition="is">comsvcs.dll</OriginalFileName>
-        </Rule>
-        <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
-        <Rule groupRelation="and" name="technique_id=T1055,technique_name=Process Injection">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <ImageLoaded condition="begin with">C:\Windows\assembly\</ImageLoaded>
-        </Rule>
-        <Rule groupRelation="and" name="technique_id=T1055,technique_name=Process Injection">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <ImageLoaded condition="begin with">C:\Windows\Microsoft.NET\assembly\GAC_MSIL</ImageLoaded>
-        </Rule>
-        <Rule groupRelation="and" name="technique_id=T1055,technique_name=Process Injection">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName condition="is">clr.dll</OriginalFileName>
-        </Rule>
-        <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
-        <Rule groupRelation="and" name="technique_id=T1059.005,technique_name=Command and Scripting Interpreter VBScript">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName condition="is">VBE7INTL.DLL</OriginalFileName>
-        </Rule>
-        <Rule groupRelation="and" name="technique_id=T1059.005,technique_name=Command and Scripting Interpreter VBScript">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName condition="is">VBE7.DLL</OriginalFileName>
-        </Rule>
-        <Rule groupRelation="and" name="technique_id=T1059.005,technique_name=Command and Scripting Interpreter VBScript">
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName condition="is">VBEUI.DLL</OriginalFileName>
-        </Rule>
-        <Rule groupRelation="and" name="technique_id=T1137.001,technique_name=Office Application Startup - Office Template Macros">
-          <!-- Credit to  @HeirhabarovT -->
-          <Image condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <OriginalFileName condition="is">OUTLVBA.DLL</OriginalFileName>
-        </Rule>
-        <Image name="technique_id=T1137,technique_name=Office Application Startup" condition="end with">VSTOInstaller.exe</Image>
-        <Rule groupRelation="and">
-          <!-- Credit to @Antonlovesdnb https://blog.pwntario.com/team-posts/antons-posts/hunting-malicious-macros-->
-          <Image name="technique_id=T1047,technique_name=Windows Management Instrumentation" condition="contains all">C:\Program Files;\Microsoft Office\root\Office</Image>
-          <ImageLoaded condition="is">C:\Windows\SysWOW64\wbem\wbemdisp.dll</ImageLoaded>
-        </Rule>
-        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">system.management.automation.ni.dll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">system.management.automation.dll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Commands.Diagnostics.dll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Commands.Management.dll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Commands.Utility.dll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.ConsoleHost.dll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1059.001,technique_name=PowerShell" condition="end with">Microsoft.PowerShell.Security.dll</ImageLoaded>
-        <ImageLoaded name="technique_id=T1210,technique_name=Exploitation of Remote Services" condition="begin with">C:\Windows\System32\spool\drivers\</ImageLoaded>
-        <!--In order to detect PrintNightmare on servers-->
-        <OriginalFileName name="technique_id=T1112,technique_name=Modify Registry" condition="is">regsvc.dll</OriginalFileName>
-        <Rule groupRelation="and">
-          <Image condition="end with">rundll32.exe</Image>
-          <OriginalFileName name="technique_id=T1003.004,technique_name=LSASS Memory" condition="is">comsvcs.dll</OriginalFileName>
-        </Rule>
-        <OriginalFileName name="technique_id=T1053,technique_name=Scheduled Task" condition="is">taskschd.dll</OriginalFileName>
-        <ImageLoaded name="technique_id=T1218.010,technique_name=Regsvr32" condition="end with">scrobj.dll</ImageLoaded>
-        <OriginalFileName name="technique_id=T1218.010,technique_name=Regsvr32" condition="is">scrobj.dll</OriginalFileName>
-        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains any">admin$;c$;\\;\appdata\;\temp\</ImageLoaded>
-        <!-- loaded from network file share -->
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">c:\programdata\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Media\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\addins\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\system32\config\systemprofile\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Debug\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Temp</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\PerfLogs\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Help\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Intel\Logs\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Temp</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\repair\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\security\</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">C:\Windows\Fonts\</ImageLoaded>
-        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Downloads</ImageLoaded>
-        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Public</ImageLoaded>
-        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Documents</ImageLoaded>
-        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Music</ImageLoaded>
-        <ImageLoaded condition="contains" name="technique_id=T1574.002,technique_name=DLL Side-Loading">Video</ImageLoaded>
-        <ImageLoaded condition="begin with" name="technique_id=T1574.002,technique_name=DLL Side-Loading">file:</ImageLoaded>
-        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">$Recycle.bin\</ImageLoaded>
-        <ImageLoaded name="technique_id=T1574.002,technique_name=DLL Side-Loading" condition="contains">\Windows\IME\</ImageLoaded>
-        <Rule groupRelation="and">
-          <OriginalFileName condition="is">urlmon.dll</OriginalFileName>
-        </Rule>
-        <ImageLoaded name="technique_id=T1047,technique_name=Windows Management Instrumentation" condition="end with">wmiutils.dll</ImageLoaded>
       </ImageLoad>
     </RuleGroup>
     <RuleGroup name="" groupRelation="or">

@@ -153,6 +153,7 @@ filepath,priority
 12_13_14_registry_event/include_local_port_monitor.xml,10
 12_13_14_registry_event/include_mounted_devices.xml,10
 12_13_14_registry_event/include_netsh.xml,10
+12_13_14_registry_event/include_network_providers.xml,100
 12_13_14_registry_event/include_office_dde.xml,10
 12_13_14_registry_event/include_office_security_features.xml,10
 12_13_14_registry_event/include_office.xml,10
@@ -298,6 +299,7 @@ filepath,priority
 7_image_load/include_scheduledtask.xml,10
 7_image_load/include_squiblydoo.xml,10
 7_image_load/include_suspicious_location.xml,10
+7_image_load/include_t1003.xml,50
 7_image_load/include_urlmonitor.xml,10
 7_image_load/include_wmi.xml,10
 8_create_remote_thread/include_all.xml,10
